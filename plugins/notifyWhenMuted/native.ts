@@ -1,3 +1,9 @@
-import { CspPolicies, MediaImageScriptsAndCssSrc } from "@main/csp";
+/*
+ * Vencord, a Discord client mod
+ * Copyright (c) 2025 Vendicated and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
 
-CspPolicies["raw.githubusercontent.com"] = MediaImageScriptsAndCssSrc;
+import { CspPolicies, ImageScriptsAndCssSrc } from "@main/csp";
+
+CspPolicies["raw.githubusercontent.com"] = ["media-src", ...ImageScriptsAndCssSrc];
