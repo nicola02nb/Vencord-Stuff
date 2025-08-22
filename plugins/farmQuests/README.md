@@ -6,7 +6,7 @@ A Vencord(VC) plugin that farms you multiple discord quests in background simult
 
 ## Credits:
 
-This is a porting for BetterDiscord of a [snippet](https://gist.github.com/aamiaa/204cd9d42013ded9faf646fae7f89fbb) made by [aamiaa](https://github.com/aamiaa).
+This is a porting for Vencord of a [snippet](https://gist.github.com/aamiaa/204cd9d42013ded9faf646fae7f89fbb) made by [aamiaa](https://github.com/aamiaa).
 
 ## Features:
 
