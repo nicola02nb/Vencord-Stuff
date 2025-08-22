@@ -18,24 +18,32 @@
 
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
-import { React, UserStore } from "@webpack/common";
+import { React } from "@webpack/common";
 
-import { ChatButton } from "./components/Button";
+import { UserChatButton } from "./components/UserChatButton";
+import { User } from "@vencord/discord-types";
 
 export default definePlugin({
-    name: "ShowPing",
-    description: "Displays your live ping.",
+    name: "ClickToChat",
+    description: "Click to open direct message.",
     authors: [Devs.nicola02nb],
     patches: [
-
+        {
+            find: "\"avatarContainerClass\",\"userNameClassName\"",
+            replacement: {
+                match: /(\((\i),t\){?=.{0,850}\.flipped])(:\i}\),children:\[)/,
+                replace: "$1$3$self.renderPing($2?.user),"
+            }
+        }
     ],
     start: () => {
     },
     stop: () => {
     },
 
-    renderPing(userId) {
-        return <ChatButton userId={userId} disabled={userId !== UserStore.getConnectedUser().id} />;
+    renderPing(user?: User) {
+        if (!user) return null;
+        return <UserChatButton user={user} />;
     }
 });
 

@@ -1,8 +1,8 @@
-# ShowPing for Vencord
+# ClickToChat for Vencord
 
-This is a porting of the original BetterDiscord(BD) plugin [ShowPing](https://github.com/nicola02nb/BetterDiscord-Stuff/tree/main/Plugins/ShowPing).
+This is a porting of the original BetterDiscord(BD) plugin [ClickToChat](https://github.com/hobbica98/ClickToChat-BetterDiscord-Plugin).
 
-A Vencord(VC) plugin that let you screenshare screen from keyboard shortcut when no game is running.
+A Vencord(VC) plugin that adds a button next to peoples names in a voice chat that takes you to their dms.
 
 ## Features:
 
