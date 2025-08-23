@@ -45,7 +45,7 @@ export default definePlugin({
         {
             find: ".horizontal,HORIZONTAL_REVERSE:",
             replacement: {
-                match: /(\i)=>{(var{children:t,className:n,direction:i=h.HORIZONTAL)/,
+                match: /(\i)=>{(var{children:\i,className:\i,direction:\i=\i.HORIZONTAL)/,
                 replace: "$1=>{$self.getButton(e);$2"
             }
         }
