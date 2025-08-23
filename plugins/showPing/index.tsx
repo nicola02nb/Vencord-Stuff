@@ -33,7 +33,7 @@ export default definePlugin({
         {
             find: ".hoverableStatus),hoverText:",
             replacement: {
-                match: /(children:f}\):null,children:)(\(0,\s*r\.jsx\)\(o\.Text,\s*\{[\s\S]*?\}\))/,
+                match: /(children:\i}\):null,children:)(\(0,\s*r\.jsx\)\(\i\.Text,\s*\{[\s\S]*?\}\))/,
                 replace: "$1[$2,$self.renderPing()]"
             }
         }
