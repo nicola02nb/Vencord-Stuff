@@ -1,30 +1,25 @@
 /*
- * Vencord, a modification for Discord's desktop app
- * Copyright (c) 2023 Vendicated and contributors
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ * Vencord, a Discord client mod
+ * Copyright (c) 2025 Vendicated and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
 
 import { definePluginSettings } from "@api/Settings";
 import { OptionType } from "@utils/types";
 
-import * as keybindsManager from "@api/Keybinds/keybindsManager";
 import { updateStream } from "./streamManager";
 
 
 export type ShikiSettings = typeof settings.store;
 export const settings = definePluginSettings({
+    testKeybind: {
+        type: OptionType.KEYBIND,
+        description: "Set the shortcut to test the keybind.",
+        global: false,
+        onChange: keys => console.log(
+            "Test keybind changed to:", keys
+        )
+    },
     displayNumber: {
         type: OptionType.NUMBER,
         description: "Default themes",
@@ -33,65 +28,39 @@ export const settings = definePluginSettings({
     toggleStream: {
         type: OptionType.KEYBIND,
         description: "Set the shortcut to toggle the stream.",
-        max: 1,
-        clearable: true,
-        onChange: value => {
-            keybindsManager.updateKeybind("toggleStream", value);
-        }
+        global: true
     },
     toggleGameOrScreen: {
         type: OptionType.KEYBIND,
         description: "Set the shortcut to toggle the game or screen.",
-        max: 1,
-        clearable: true,
-        onChange: value => {
-            keybindsManager.updateKeybind("toggleGameOrScreen", value);
-        }
+        global: true
     },
     toggleAudio: {
         type: OptionType.KEYBIND,
         description: "Set the shortcut to toggle the audio.",
-        max: 1,
-        clearable: true,
-        onChange: value => {
-            keybindsManager.updateKeybind("toggleAudio", value);
-        }
+        global: true
     },
     startStreaming: {
         type: OptionType.KEYBIND,
         description: "Set the shortcut to start the stream.",
-        max: 1,
-        clearable: true,
-        onChange: value => {
-            keybindsManager.updateKeybind("startStreaming", value);
-        }
+        global: true
     },
     stopStreaming: {
         type: OptionType.KEYBIND,
         description: "Set the shortcut to stop the stream.",
-        max: 1,
-        clearable: true,
-        onChange: value => {
-            keybindsManager.updateKeybind("stopStreaming", value);
-        }
+        global: true
     },
     disablePreview: {
         type: OptionType.BOOLEAN,
         description: "If enabled, the preview will be disabled.",
         default: false,
-        onChange: (value: boolean) => {
-            settings.store.disablePreview = value;
-            updateStream();
-        }
+        onChange: updateStream
     },
     shareAudio: {
         type: OptionType.BOOLEAN,
         description: "If enabled, audio will be shared.",
         default: true,
-        onChange: (value: boolean) => {
-            settings.store.shareAudio = value;
-            updateStream();
-        }
+        onChange: updateStream
     },
     shareAlwaysScreen: {
         type: OptionType.BOOLEAN,

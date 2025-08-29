@@ -1,7 +1,14 @@
+/*
+ * Vencord, a Discord client mod
+ * Copyright (c) 2025 Vendicated and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
 import { MessageJSON } from "@vencord/discord-types";
-import settings from "../settings";
-import { GuildMemberStore, MediaEngineStore, RTCConnectionStore, UserGuildSettingsStore, ChannelStore, GuildStore, RelationshipStore, SelectedChannelStore, SelectedGuildStore, UserStore } from "../stores";
 import { showToast } from "@webpack/common";
+
+import settings from "../settings";
+import { ChannelStore, GuildMemberStore, GuildStore, MediaEngineStore, RelationshipStore, RTCConnectionStore, SelectedChannelStore, SelectedGuildStore, UserGuildSettingsStore, UserStore } from "../stores";
 
 type ExtendedMessageJSON = MessageJSON & { prependGuildChannel?: boolean; };
 
@@ -16,7 +23,7 @@ export function updateRelationships() {
 }
 
 function isConnected() {
-    let channelId = SelectedChannelStore.getVoiceChannelId();
+    const channelId = SelectedChannelStore.getVoiceChannelId();
     return channelId !== null;
 }
 
@@ -39,19 +46,19 @@ export function shouldIgnoreWhenConnected(source) {
 
 // Message evaluation
 export function shouldPlayMessage(message: ExtendedMessageJSON) {
-    let isSelfDeaf = MediaEngineStore.isSelfDeaf();
+    const isSelfDeaf = MediaEngineStore.isSelfDeaf();
     if (isSelfDeaf || message.state === "SENDING" || message.content === "")
         return false;
 
-    let messageAuthorId = message.author.id;
-    let messageChannelId = message.channel_id;
-    let messageGuildId = message.guild_id;
+    const messageAuthorId = message.author.id;
+    const messageChannelId = message.channel_id;
+    const messageGuildId = message.guild_id;
 
-    let userId = UserStore.getCurrentUser().id;
-    let focusedChannel = SelectedChannelStore.getCurrentlySelectedChannelId();
-    let connectedChannel = RTCConnectionStore.getChannelId();
-    let focusedGuild = SelectedGuildStore.getGuildId();
-    let connectedGuild = RTCConnectionStore.getGuildId();
+    const userId = UserStore.getCurrentUser().id;
+    const focusedChannel = SelectedChannelStore.getCurrentlySelectedChannelId();
+    const connectedChannel = RTCConnectionStore.getChannelId();
+    const focusedGuild = SelectedGuildStore.getGuildId();
+    const connectedGuild = RTCConnectionStore.getGuildId();
 
     const mutedChannels = UserGuildSettingsStore.getMutedChannels(messageGuildId);
     const mutedGuilds = UserGuildSettingsStore.isMuted(messageGuildId);
@@ -98,7 +105,7 @@ export function shouldPlayMessage(message: ExtendedMessageJSON) {
 }
 
 export function getUserName(userId, guildId) {
-    let user = UserStore.getUser(userId);
+    const user = UserStore.getUser(userId);
     switch (settings.store.messageNamesReading) {
         case "userName":
             return user.username;
@@ -124,23 +131,23 @@ export function getPatchedContent(message: ExtendedMessageJSON, guildId: string 
         .replace(/<#(\d+)>/g, (match, channelId) => ChannelStore.getChannel(channelId)?.name)
         .replace(/<a?:(\w+):(\d+)>/g, (match, emojiName) => "Emoji " + emojiName)
         .replace(/\|\|([^|]+)\|\|/g, (match, content) => settings.store.messageSpoilersReading ? content : "Spoiler")
-        .replace(/https?:\/\/[^\s]+/g, (url) => {
+        .replace(/https?:\/\/[^\s]+/g, url => {
             switch (settings.store.messageLinksReading) {
-                case 'remove':
-                    return '';
-                case 'domain':
+                case "remove":
+                    return "";
+                case "domain":
                     const domain = new URL(url).hostname;
                     return domain;
-                case 'sobstitute':
-                    return 'URL';
-                case 'keep':
+                case "sobstitute":
+                    return "URL";
+                case "keep":
                     return url;
                 default:
                     return url;
             }
         });
     for (const rule of settings.store.textReplacerRules) {
-        let parts = /\/(.*)\/(.*)/.exec(rule.regex);
+        const parts = /\/(.*)\/(.*)/.exec(rule.regex);
         let regex: RegExp | null = null;
         if (regex == null) {
             regex = new RegExp(rule.regex);
@@ -155,17 +162,17 @@ export function getPatchedContent(message: ExtendedMessageJSON, guildId: string 
     let toRead = "";
     if (settings.store.messagePrependChannel || settings.store.messagePrependGuild || settings.store.messagePrependNames) {
         if (settings.store.messagePrependNames) {
-            let username = getUserName(message.author.id, guildId);
+            const username = getUserName(message.author.id, guildId);
             toRead += `${username} `;
         }
         if ((settings.store.messagePrependGuild || settings.store.messagePrependChannel) && message.prependGuildChannel) {
             toRead += "in ";
             if (settings.store.messagePrependGuild) {
-                let guild = GuildStore.getGuild(guildId);
+                const guild = GuildStore.getGuild(guildId);
                 toRead += `${guild?.name} `;
             }
             if (settings.store.messagePrependChannel) {
-                let channel = ChannelStore.getChannel(message.channel_id);
+                const channel = ChannelStore.getChannel(message.channel_id);
                 toRead += `${channel?.name} `;
             }
         }

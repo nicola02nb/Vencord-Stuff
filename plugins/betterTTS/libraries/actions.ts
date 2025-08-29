@@ -1,26 +1,33 @@
+/*
+ * Vencord, a Discord client mod
+ * Copyright (c) 2025 Vendicated and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
 import { FluxEvent, MessageJSON } from "@vencord/discord-types";
+
+import settings from "../settings";
+import { MediaEngineStore, RTCConnectionStore, UserStore } from "../stores";
 import AudioPlayer from "./AudioPlayer";
 import { getPatchedContent, getUserName, shouldPlayMessage } from "./utils";
-import { MediaEngineStore, RTCConnectionStore, UserStore } from "../stores";
-import settings from "../settings";
 
 export function messageRecieved(event: FluxEvent) {
     if (!settings.store.enableTts) return;
-    let message = event.message as MessageJSON;
+    const message = event.message as MessageJSON;
     if ((event.guildId || !message.member) && shouldPlayMessage(event.message)) {
-        let text = getPatchedContent(message, message.guild_id);
+        const text = getPatchedContent(message, message.guild_id);
         AudioPlayer.startTTS(text);
     }
 }
 
 export function annouceUser(event: FluxEvent) {
     if (!settings.store.enableTts) return;
-    let connectedChannelId = RTCConnectionStore.getChannelId();
-    let userId = UserStore.getCurrentUser().id;
+    const connectedChannelId = RTCConnectionStore.getChannelId();
+    const userId = UserStore.getCurrentUser().id;
     for (const userStatus of event.voiceStates) {
         if (connectedChannelId && userStatus.userId !== userId) {
             if (userStatus.channelId !== userStatus.oldChannelId) {
-                let username = getUserName(userStatus.userId, userStatus.guildId);
+                const username = getUserName(userStatus.userId, userStatus.guildId);
                 if (userStatus.channelId === connectedChannelId) {
                     AudioPlayer.startTTS(`${username} joined`, true);
                 } else if (userStatus.oldChannelId === connectedChannelId) {
@@ -33,7 +40,7 @@ export function annouceUser(event: FluxEvent) {
 
 export function speakMessage(event: FluxEvent) {
     if (!settings.store.enableTts) return;
-    let text = getPatchedContent(event.message, event.channel.guild_id);
+    const text = getPatchedContent(event.message, event.channel.guild_id);
     AudioPlayer.startTTS(text);
 }
 

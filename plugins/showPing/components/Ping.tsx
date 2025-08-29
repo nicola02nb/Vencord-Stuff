@@ -1,8 +1,15 @@
+/*
+ * Vencord, a Discord client mod
+ * Copyright (c) 2025 Vendicated and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
 import "./Ping.css";
 
-import { FluxDispatcher, Text, useEffect, useState } from "@webpack/common";
-import { RTCConnectionStore } from "plugins/showPing/stores";
 import { FluxEvent } from "@vencord/discord-types";
+import { FluxDispatcher, Text, useEffect, useState } from "@webpack/common";
+
+import { RTCConnectionStore } from "../stores";
 
 export function PingElement() {
     const [ping, setPing] = useState(RTCConnectionStore.getLastPing());

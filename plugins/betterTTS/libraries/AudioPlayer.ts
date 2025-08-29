@@ -1,8 +1,13 @@
-import settings from "../settings";
+/*
+ * Vencord, a Discord client mod
+ * Copyright (c) 2025 Vendicated and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
 import { default as DiscordTTS } from "../Sources/Discord";
 import { default as StreamElementsTTS } from "../Sources/Streamelements";
 import { default as TikTokTTS } from "../Sources/TikTok";
-import { TTSSource, TTSSourceInterface, TTSVoice } from "../types/ttssource";
+import { TTSSource, TTSSourceInterface, TTSVoice, TTSVoiceOption } from "../types/ttssource";
 
 function clamp(number: number, min: number, max: number) {
     return Math.max(min, Math.min(number, max));
@@ -13,6 +18,29 @@ export const sourcesOptions = [
     { label: "StreamElements", value: "streamelements" },
     { label: "TikTok", value: "tiktok" }
 ];
+
+function getSource(source: TTSSource): TTSSourceInterface<any> | undefined {
+    switch (source) {
+        case "discord":
+            return DiscordTTS;
+        case "streamelements":
+            return StreamElementsTTS;
+        case "tiktok":
+            return TikTokTTS;
+        default:
+            return undefined;
+    }
+}
+
+export function getVoices(source: TTSSource): TTSVoiceOption[] {
+    const sourceInterface = getSource(source);
+    return sourceInterface ? sourceInterface.getVoices() : [];
+}
+
+export function getDefaultVoice(source: TTSSource): string {
+    const sourceInterface = getSource(source);
+    return sourceInterface ? sourceInterface.getDefaultVoice() : "";
+}
 
 export const nameToInterface: Record<string, TTSSourceInterface<any>> = {
     "discord": DiscordTTS,
@@ -35,23 +63,18 @@ export default new class AudioPlayer {
     delay: number = 0;
     volume: number = 1.0;
 
-    updateConfig(source: TTSSource | undefined, voice: TTSVoice | undefined, rate: number, delay: number, volume: number) {
-        this.updateTTSSource(source, voice);
+    updateConfig(source: TTSSource, voice: TTSVoice, rate: number, delay: number, volume: number) {
+        this.updateTTSSourceAndVoice(source, voice);
         this.updateRate(rate);
         this.updateDelay(delay);
         this.updateVolume(volume);
     }
 
-    updateTTSSource(source: TTSSource | undefined = "discord", voice?: TTSVoice) {
+    updateTTSSourceAndVoice(source: TTSSource, voice: TTSVoice) {
         this.sourceInterface = nameToInterface[source];
-        settings.def.ttsVoice.options = this.sourceInterface.getVoices();
         if (!voice) {
             voice = this.sourceInterface.getDefaultVoice();
         }
-        this.sourceInterface.setVoice(voice);
-    }
-
-    updateVoice(voice: TTSVoice) {
         this.sourceInterface.setVoice(voice);
     }
 
@@ -122,7 +145,7 @@ export default new class AudioPlayer {
         if (this.media instanceof HTMLAudioElement) {
             this.media.playbackRate = this.rate;
             this.media.volume = clamp(this.volume, 0, 1);
-            this.media.addEventListener('ended', () => this.playNextTTS());
+            this.media.addEventListener("ended", () => this.playNextTTS());
             this.media.play();
         } else if (this.media instanceof SpeechSynthesisUtterance) {
             this.media.rate = this.rate;

@@ -1,27 +1,15 @@
 /*
- * Vencord, a modification for Discord's desktop app
- * Copyright (c) 2022 Vendicated and contributors
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ * Vencord, a Discord client mod
+ * Copyright (c) 2025 Vendicated and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
 
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
+import { FluxDispatcher, RestAPI } from "@webpack/common";
 
 import settings from "./settings";
 import { ChannelStore, GuildChannelStore, QuestsStore, RunningGameStore } from "./stores";
-import { FluxDispatcher, RestAPI } from "@webpack/common";
 
 let availableQuests: QuestValue[] = [];
 let farmableQuests: QuestValue[] = [];
@@ -127,7 +115,7 @@ function stopFarmingAll() {
 }
 
 function farmQuest(quest) {
-    let isApp = typeof DiscordNative !== "undefined";
+    const isApp = typeof DiscordNative !== "undefined";
     if (!quest) {
         console.log("You don't have any uncompleted quests!");
     } else {
@@ -135,7 +123,7 @@ function farmQuest(quest) {
 
         const applicationId = quest.config.application.id;
         const applicationName = quest.config.application.name;
-        const questName = quest.config.messages.questName;
+        const { questName } = quest.config.messages;
         const taskConfig = quest.config.taskConfig ?? quest.config.taskConfigV2;
         const taskName = ["WATCH_VIDEO", "PLAY_ON_DESKTOP", "STREAM_ON_DESKTOP", "PLAY_ACTIVITY", "WATCH_VIDEO_ON_MOBILE"].find(x => taskConfig.tasks[x] != null);
         if (!taskName) {
@@ -160,7 +148,7 @@ function farmQuest(quest) {
                 const maxFuture = 10, speed = 7, interval = 1;
                 const enrolledAt = new Date(quest.userStatus.enrolledAt).getTime();
                 let completed = false;
-                let watchVideo = async () => {
+                const watchVideo = async () => {
                     while (true) {
                         const maxAllowed = Math.floor((Date.now() - enrolledAt) / 1000) + maxFuture;
                         const diff = maxAllowed - secondsDone;
@@ -211,14 +199,14 @@ function farmQuest(quest) {
                         processName: appData.name,
                         start: Date.now(),
                     };
-                    const realGames = fakeGames.size == 0 ? RunningGameStore.getRunningGames() : [];
+                    const realGames = fakeGames.size === 0 ? RunningGameStore.getRunningGames() : [];
                     fakeGames.set(quest.id, fakeGame);
                     const fakeGames2 = Array.from(fakeGames.values());
                     FluxDispatcher.dispatch({ type: "RUNNING_GAMES_CHANGE", removed: realGames, added: [fakeGame], games: fakeGames2 });
 
-                    let playOnDesktop = (event) => {
+                    const playOnDesktop = event => {
                         if (event.questId !== quest.id) return;
-                        let progress = quest.config.configVersion === 1 ? event.userStatus.streamProgressSeconds : Math.floor(event.userStatus.progress.PLAY_ON_DESKTOP.value);
+                        const progress = quest.config.configVersion === 1 ? event.userStatus.streamProgressSeconds : Math.floor(event.userStatus.progress.PLAY_ON_DESKTOP.value);
                         console.log(`Quest progress ${questName}: ${progress}/${secondsNeeded}`);
 
                         if (!farmingQuest.get(quest.id) || progress >= secondsNeeded) {
@@ -226,7 +214,7 @@ function farmQuest(quest) {
 
                             fakeGames.delete(quest.id);
                             const games = RunningGameStore.getRunningGames();
-                            const added = fakeGames.size == 0 ? games : [];
+                            const added = fakeGames.size === 0 ? games : [];
                             FluxDispatcher.dispatch({ type: "RUNNING_GAMES_CHANGE", removed: [fakeGame], added: added, games: games });
                             FluxDispatcher.unsubscribe("QUESTS_SEND_HEARTBEAT_SUCCESS", playOnDesktop);
 
@@ -251,9 +239,9 @@ function farmQuest(quest) {
                 };
                 fakeApplications.set(quest.id, fakeApp);
 
-                let streamOnDesktop = (event) => {
+                const streamOnDesktop = event => {
                     if (event.questId !== quest.id) return;
-                    let progress = quest.config.configVersion === 1 ? event.userStatus.streamProgressSeconds : Math.floor(event.userStatus.progress.STREAM_ON_DESKTOP.value);
+                    const progress = quest.config.configVersion === 1 ? event.userStatus.streamProgressSeconds : Math.floor(event.userStatus.progress.STREAM_ON_DESKTOP.value);
                     console.log(`Quest progress ${questName}: ${progress}/${secondsNeeded}`);
 
                     if (!farmingQuest.get(quest.id) || progress >= secondsNeeded) {
@@ -278,7 +266,7 @@ function farmQuest(quest) {
                 const channelId = ChannelStore.getSortedPrivateChannels()[0]?.id ?? Object.values(GuildChannelStore.getAllGuilds()).find(x => x != null && x.VOCAL.length > 0).VOCAL[0].channel.id;
                 const streamKey = `call:${channelId}:1`;
 
-                let playActivity = async () => {
+                const playActivity = async () => {
                     console.log("Completing quest", questName, "-", quest.config.messages.questName);
 
                     while (true) {

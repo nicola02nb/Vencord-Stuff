@@ -1,3 +1,9 @@
+/*
+ * Vencord, a Discord client mod
+ * Copyright (c) 2025 Vendicated and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
 interface QuestData {
     key: string;
     value: QuestValue;
@@ -77,7 +83,7 @@ interface Messages2 {
 }
 
 interface RedemptionInstructionsByPlatform {
-    '0': string;
+    "0": string;
 }
 
 interface TaskConfigV2 {

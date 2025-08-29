@@ -1,9 +1,16 @@
+/*
+ * Vencord, a Discord client mod
+ * Copyright (c) 2025 Vendicated and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
 import "./ToggleButton.css";
 
+import { findByPropsLazy } from "@webpack";
 import { Button, Tooltip, useState } from "@webpack/common";
+
 import { settings } from "../settings";
 import { Icon } from "./Icon";
-import { findByPropsLazy } from "@webpack";
 
 const buttonStates = findByPropsLazy("enabled", "button");
 

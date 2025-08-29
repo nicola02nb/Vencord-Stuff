@@ -1,20 +1,8 @@
 /*
- * Vencord, a modification for Discord's desktop app
- * Copyright (c) 2022 Vendicated and contributors
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ * Vencord, a Discord client mod
+ * Copyright (c) 2025 Vendicated and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
 
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
@@ -28,11 +16,12 @@ export default definePlugin({
     authors: [Devs.nicola02nb],
     settings,
     keybinds: [
-        { name: "startStreaming", function: startStreaming, options: { blurred: false, focused: false, keydown: true, keyup: false } },
-        { name: "stopStreaming", function: stopStreaming, options: { blurred: false, focused: false, keydown: true, keyup: false } },
-        { name: "toggleAudio", function: toggleAudio, options: { blurred: false, focused: false, keydown: true, keyup: false } },
-        { name: "toggleStream", function: toggleStream, options: { blurred: false, focused: false, keydown: true, keyup: false } },
-        { name: "toggleGameOrScreen", function: toggleGameOrScreen, options: { blurred: false, focused: true, keydown: true, keyup: false } }
+        { event: "testKeybind", global: false, function: () => console.log("Test keybind pressed!"), options: { keydown: true, keyup: false } },
+        { event: "startStreaming", global: true, function: startStreaming, options: { blurred: false, focused: false, keydown: true, keyup: false } },
+        { event: "stopStreaming", global: true, function: stopStreaming, options: { blurred: false, focused: false, keydown: true, keyup: false } },
+        { event: "toggleAudio", global: true, function: toggleAudio, options: { blurred: false, focused: false, keydown: true, keyup: false } },
+        { event: "toggleStream", global: true, function: toggleStream, options: { blurred: false, focused: false, keydown: true, keyup: false } },
+        { event: "toggleGameOrScreen", global: true, function: toggleGameOrScreen, options: { blurred: false, focused: true, keydown: true, keyup: false } }
     ],
     start: () => {
     },
