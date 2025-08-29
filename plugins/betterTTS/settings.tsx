@@ -70,13 +70,13 @@ const settings = definePluginSettings({
     subscribedChannels: {
         type: OptionType.COMPONENT,
         component: DropdownButtonGroup,
-        componentProps: { type: "channel", getNameFunction: ChannelStore.getChannel },
+        componentProps: { id: "subscribedChannels", getNameFunction: ChannelStore.getChannel },
         default: new Array<string>()
     },
     subscribedGuilds: {
         type: OptionType.COMPONENT,
         component: DropdownButtonGroup,
-        componentProps: { type: "guild", getNameFunction: GuildStore.getGuild },
+        componentProps: { id: "subscribedGuilds", getNameFunction: GuildStore.getGuild },
         default: new Array<string>()
     },
     channelInfoReading: {
@@ -143,7 +143,7 @@ const settings = definePluginSettings({
     ttsMutedUsers: {
         type: OptionType.COMPONENT,
         component: DropdownButtonGroup,
-        componentProps: { type: "user", getNameFunction: UserStore.getUser },
+        componentProps: { id: "ttsMutedUsers", getNameFunction: UserStore.getUser },
         default: new Array<string>()
     },
     blockBlockedUsers: {
@@ -334,10 +334,10 @@ function DropdownSourceAndVoices({ }) {
 
 function DropdownButtonGroup({ setValue, option }: IPluginOptionComponentProps) {
     const [selectedOption, setSelectedOption] = useState("");
-    const { type } = option.componentProps;
-    const labeltext = type === "subscribedChannels" ? "Remove Channel" : type === "subscribedGuilds" ? "Remove Guild" : "Remove User";
+    const { id } = option.componentProps;
+    const labeltext = id === "subscribedChannels" ? "Remove Channel" : id === "subscribedGuilds" ? "Remove Guild" : "Remove User";
 
-    const [options, setOptions] = useState<string[]>(settings.store[type] || []);
+    const [options, setOptions] = useState<string[]>(settings.store[id] || []);
 
     return (
         <div style={{ display: "flex", flexDirection: "row", gap: "8px" }}>
@@ -362,6 +362,7 @@ function DropdownButtonGroup({ setValue, option }: IPluginOptionComponentProps) 
                         const newOptions = options.filter((_, i) => i !== index);
                         setSelectedOption("");
                         setOptions([...newOptions]);
+                        settings.store[id] = newOptions;
                     }
                 }}
             >
