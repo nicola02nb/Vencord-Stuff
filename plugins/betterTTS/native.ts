@@ -7,4 +7,4 @@
 import { CspPolicies } from "@main/csp";
 
 CspPolicies["api.streamelements.com"] = ["connect-src", "media-src"];
-CspPolicies["tiktok-tts.weilnet.workers.dev"] = ["media-src"];
+CspPolicies["tiktok-tts.weilnet.workers.dev"] = ["connect-src", "media-src"];

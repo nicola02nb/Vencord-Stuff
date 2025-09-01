@@ -56,8 +56,8 @@ export const PatchUserContextMenu: NavContextMenuPatchCallback = (children, { us
         <Menu.MenuCheckboxItem
             id="bettertts-mute-user"
             label="Mute TTS Messages"
-            checked={settings.store.ttsMutedUsers.includes(user.id)}
-            action={() => toggleItemInArray(settings.store.ttsMutedUsers, user.id)}
+            checked={settings.store.mutedUsers.includes(user.id)}
+            action={() => toggleItemInArray(settings.store.mutedUsers, user.id)}
         />,
         <Menu.MenuItem
             id="bettertts-speak-announcement"

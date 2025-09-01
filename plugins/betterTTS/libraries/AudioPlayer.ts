@@ -132,13 +132,15 @@ export default new class AudioPlayer {
     }
 
     playNextTTS() {
-        this.playingText = "";
-        this.media = undefined;
-        if (this.priorityMessages.length > 0 || this.normalMessages.length > 0) {
-            this.playTTS();
-        } else {
-            this.isPlaying = false;
-        }
+        setTimeout(() => {
+            this.playingText = "";
+            this.media = undefined;
+            if (this.priorityMessages.length > 0 || this.normalMessages.length > 0) {
+                this.playTTS();
+            } else {
+                this.isPlaying = false;
+            }
+        }, this.delay);
     }
 
     playAudio() {
@@ -163,7 +165,7 @@ export default new class AudioPlayer {
         if (this.playingText) {
             this.sourceInterface.getMedia(this.playingText).then(media => {
                 this.media = media;
-                setTimeout(() => this.playAudio(), this.delay);
+                this.playAudio();
             }).catch(error => {
                 console.error("Error getting media:", error);
                 this.playNextTTS();

@@ -5,16 +5,16 @@
  */
 
 import { definePluginSettings } from "@api/Settings";
+import { SettingsSection } from "@components/settings/tabs/plugins/components/Common";
 import { IPluginOptionComponentProps, OptionType } from "@utils/types";
-import { Button, Select, TextInput } from "webpack/common/components";
+import { findByCodeLazy } from "@webpack";
+import { Button, Flex, Select, Text, TextInput } from "webpack/common/components";
 import { useEffect, useState } from "webpack/common/react";
 
 import * as betterTTS from "./index";
 import AudioPlayer, { getDefaultVoice, getVoices, sourcesOptions } from "./libraries/AudioPlayer";
-import { updateToggleKeys } from "./libraries/utils";
 import { ChannelStore, GuildStore, UserSettingsProtoStore, UserStore } from "./stores";
 
-// TODO: finish implementing the settings description for custom components
 const settings = definePluginSettings({
     enableTts: {
         type: OptionType.BOOLEAN,
@@ -140,10 +140,10 @@ const settings = definePluginSettings({
     ttsVoice: {
         type: OptionType.CUSTOM
     },
-    ttsMutedUsers: {
+    mutedUsers: {
         type: OptionType.COMPONENT,
         component: DropdownButtonGroup,
-        componentProps: { id: "ttsMutedUsers", getNameFunction: UserStore.getUser },
+        componentProps: { id: "mutedUsers", getNameFunction: UserStore.getUser },
         default: new Array<string>()
     },
     blockBlockedUsers: {
@@ -210,17 +210,18 @@ const settings = definePluginSettings({
     ttsDelayBetweenMessages: {
         type: OptionType.NUMBER,
         default: 1000,
-        description: "Only works for Syncronous messages.",
+        description: "Only works for Syncronous messages (ms).",
         onChange: (value: number) => {
             AudioPlayer.updateDelay(value);
-        }
+        },
+        placeholder: "Delay in milliseconds",
     },
     textReplacerRules: {
         type: OptionType.COMPONENT,
         component: TextReplaceDropdown,
         default: new Array<{ regex: string; replacement: string; }>()
     },
-    ttsToggle: {
+    /* ttsToggle: {
         type: OptionType.KEYBIND,
         description: "Shortcut to toggle the TTS.",
         clearable: true,
@@ -229,59 +230,10 @@ const settings = definePluginSettings({
         onChange: (value: string[]) => {
             updateToggleKeys(value);
         }
-    },
+    }, */
 });
 export default settings;
 
-function PreviewTTS() {
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [text, setText] = useState("This is what text-to-speech sounds like at the current speed.");
-
-    const getLabel = (play: boolean) => {
-        if (play) {
-            return (
-                <>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-pause-fill" viewBox="0 0 16 16">
-                        <path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5m5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5" />
-                    </svg>
-                    Preview
-                </>
-            );
-        } else {
-            return (
-                <>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-play-fill" viewBox="0 0 16 16">
-                        <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393" />
-                    </svg>
-                    Preview
-                </>
-            );
-        }
-    };
-
-    return (
-        <>
-            <TextInput
-                value={text}
-                placeholder="Enter text to preview"
-                onChange={event => {
-                    setText(event);
-                }}
-            />
-            <Button
-                onClick={() => {
-                    AudioPlayer.playNextTTS();
-                    if (!isPlaying) {
-                        AudioPlayer.startTTS(text, true);
-                    }
-                    setIsPlaying(!isPlaying);
-                }}
-            >
-                {getLabel(isPlaying)}
-            </Button>
-        </>
-    );
-}
 
 function DropdownSourceAndVoices({ }) {
     const initialSource = settings.store.ttsSource;
@@ -290,14 +242,8 @@ function DropdownSourceAndVoices({ }) {
     const optionsSources = sourcesOptions;
     const [selectedSource, setSelectedSource] = useState(initialSource);
 
-    const [optionsVoices, setOptionsVoices] = useState(getVoices(initialSource) || []);
-    const [selectedVoice, setSelectedVoice] = useState(initialVoice || getDefaultVoice(initialSource) || optionsVoices[0]?.value);
-
-    useEffect(() => {
-        setOptionsVoices(getVoices(selectedSource) || []);
-        const newVoice = getDefaultVoice(selectedSource) || optionsVoices[0]?.value;
-        setSelectedVoice(newVoice);
-    }, [selectedSource]);
+    const [optionsVoices, setOptionsVoices] = useState(getVoices(initialSource));
+    const [selectedVoice, setSelectedVoice] = useState(initialVoice || getDefaultVoice(initialSource));
 
     useEffect(() => {
         settings.store.ttsSource = selectedSource;
@@ -307,40 +253,43 @@ function DropdownSourceAndVoices({ }) {
     }, [selectedVoice]);
 
     return (
-        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-            <Select
-                options={optionsSources}
-                placeholder="Select TTS Source"
-                closeOnSelect={true}
-                select={(value: string) => {
-                    setSelectedSource(value);
-                }}
-                isSelected={(value: string) => selectedSource === value}
-                serialize={(value: string) => String(value)}
-            />
-            <Select
-                options={optionsVoices}
-                placeholder="Select TTS Voice"
-                closeOnSelect={true}
-                select={(value: string) => {
-                    setSelectedVoice(value);
-                }}
-                isSelected={(value: string) => selectedVoice === value}
-                serialize={(value: string) => String(value)}
-            />
-        </div>
+        <SettingsSection description="Select the TTS source and voice you want to use." name="TTS Source and Voice" error={null}>
+            <Flex direction={Flex.Direction.HORIZONTAL} justify={Flex.Justify.BETWEEN} align={Flex.Align.CENTER}>
+                <Select
+                    options={optionsSources}
+                    placeholder="Select TTS Source"
+                    closeOnSelect={true}
+                    select={(value: string) => {
+                        setSelectedSource(value);
+                        setOptionsVoices(getVoices(value));
+                        setSelectedVoice(getDefaultVoice(value));
+                    }}
+                    isSelected={(value: string) => selectedSource === value}
+                    serialize={(value: string) => String(value)}
+                />
+                <Select
+                    options={optionsVoices}
+                    placeholder="Select TTS Voice"
+                    closeOnSelect={true}
+                    select={(value: string) => {
+                        setSelectedVoice(value);
+                    }}
+                    isSelected={(value: string) => selectedVoice === value}
+                    serialize={(value: string) => String(value)}
+                />
+            </Flex>
+        </SettingsSection>
     );
 }
 
 function DropdownButtonGroup({ setValue, option }: IPluginOptionComponentProps) {
     const [selectedOption, setSelectedOption] = useState("");
     const { id } = option.componentProps;
-    const labeltext = id === "subscribedChannels" ? "Remove Channel" : id === "subscribedGuilds" ? "Remove Guild" : "Remove User";
 
     const [options, setOptions] = useState<string[]>(settings.store[id] || []);
 
     return (
-        <div style={{ display: "flex", flexDirection: "row", gap: "8px" }}>
+        <SettingsSection inlineSetting={true} description="Use the dropdown to select an option to remove it from the list." name={id} error={null}>
             <Select
                 placeholder="Select one to remove"
                 select={value => setSelectedOption(value)}
@@ -366,9 +315,59 @@ function DropdownButtonGroup({ setValue, option }: IPluginOptionComponentProps) 
                     }
                 }}
             >
-                {labeltext}
+                Remove
             </Button>
-        </div>
+        </SettingsSection>
+    );
+}
+
+const IconPlay = findByCodeLazy("M9.25 3.35C7.87 2.45");
+const IconPause = findByCodeLazy("M6 4a1 1 0 0 0-1");
+function PreviewTTS() {
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [text, setText] = useState("This is what text-to-speech sounds like at the current speed.");
+
+    const getLabel = (play: boolean) => {
+        if (play) {
+            return (
+                <Flex direction={Flex.Direction.HORIZONTAL} align={Flex.Align.CENTER}>
+                    <IconPause />
+                    <Text>
+                        Preview
+                    </Text>
+                </Flex>
+            );
+        } else {
+            return (
+                <Flex direction={Flex.Direction.HORIZONTAL} align={Flex.Align.CENTER}>
+                    <IconPlay />
+                    <Text>Preview</Text>
+                </Flex>
+            );
+        }
+    };
+
+    return (
+        <SettingsSection inlineSetting={true} description="Preview the current TTS settings." name="TTS Preview" error={null}>
+            <TextInput
+                value={text}
+                placeholder="Enter text to preview"
+                onChange={event => {
+                    setText(event);
+                }}
+            />
+            <Button
+                onClick={() => {
+                    if (!isPlaying) {
+                        AudioPlayer.startTTS(text, true);
+                        AudioPlayer.stopCurrentTTS();
+                    }
+                    setIsPlaying(!isPlaying);
+                }}
+            >
+                {getLabel(isPlaying)}
+            </Button>
+        </SettingsSection>
     );
 }
 
@@ -389,8 +388,8 @@ function TextReplaceDropdown({ }) {
     }
 
     return (
-        <>
-            <div style={{ display: "flex", flexDirection: "row", gap: "8px" }}>
+        <SettingsSection description="Manage text replacement rules." name="Text Replacement" error={null}>
+            <Flex Direction="HORIZONTAL" justify={Flex.Justify.BETWEEN} align={Flex.Align.CENTER}>
                 <Select
                     placeholder="Regex List"
                     options={[
@@ -407,11 +406,12 @@ function TextReplaceDropdown({ }) {
                 <Button onClick={removeRegex}>
                     Remove Regex
                 </Button>
-            </div>
+            </Flex>
             <TextReplaceAdd onAdd={addRegex} />
-        </>
+        </SettingsSection>
     );
 }
+
 
 function TextReplaceAdd({ onAdd }) {
     const [regex, setRegex] = useState("");
@@ -420,7 +420,7 @@ function TextReplaceAdd({ onAdd }) {
     const disabled = regex === "" || replacement === "";
 
     return (
-        <>
+        <Flex direction={Flex.Direction.HORIZONTAL} justify={Flex.Justify.BETWEEN} align={Flex.Align.CENTER}>
             <TextInput
                 value={regex}
                 placeholder="Enter Regex"
@@ -445,6 +445,6 @@ function TextReplaceAdd({ onAdd }) {
             >
                 Add Regex
             </Button>
-        </>
+        </Flex>
     );
 }
