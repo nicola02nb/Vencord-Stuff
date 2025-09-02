@@ -9,7 +9,7 @@ import definePlugin from "@utils/types";
 import { React } from "@webpack/common";
 
 import { PingElement } from "./components/Ping";
-import { settings } from "./settings";
+import { displayKrispButton, settings } from "./settings";
 
 export default definePlugin({
     name: "ShowPing",
@@ -26,8 +26,10 @@ export default definePlugin({
         }
     ],
     start: () => {
+        displayKrispButton(settings.store.hideKrispButton);
     },
     stop: () => {
+        displayKrispButton(false);
     },
 
     renderPing() {

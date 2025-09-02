@@ -1,0 +1,3 @@
+div[class*="voiceButtonsContainer_"] > button[aria-label*="Krisp"] {
+    display: none !important;
+}
