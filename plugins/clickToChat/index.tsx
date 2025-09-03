@@ -19,7 +19,7 @@ export default definePlugin({
         {
             find: "\"avatarContainerClass\",\"userNameClassName\"",
             replacement: {
-                match: /(\((\i),t\){?=.{0,850}\.flipped])(:\i}\),children:\[)/,
+                match: /(\((\i),\i\){?=.{0,850}\.flipped])(:\i}\),children:\[)/,
                 replace: "$1$3$self.renderPing($2?.user),"
             }
         }

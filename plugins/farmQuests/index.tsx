@@ -8,6 +8,7 @@ import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
 import { FluxDispatcher, RestAPI } from "@webpack/common";
 
+import { QuestButton } from "./components/QuestButton";
 import settings from "./settings";
 import { ChannelStore, GuildChannelStore, QuestsStore, RunningGameStore } from "./stores";
 
@@ -18,7 +19,7 @@ const farmingQuest = new Map();
 const fakeGames = new Map();
 const fakeApplications = new Map();
 
-let updateInterval: NodeJS.Timeout | null = null;
+const updateInterval: NodeJS.Timeout | null = null;
 
 export default definePlugin({
     name: "FarmQuests",
@@ -26,6 +27,13 @@ export default definePlugin({
     authors: [Devs.nicola02nb],
     settings,
     patches: [
+        {
+            find: ".winButtonsWithDivider]",
+            replacement: {
+                match: /(\((\i)\){)(let{leading)/,
+                replace: "$1$2.trailing.props.children.unshift($self.renderQuestButton());$3"
+            }
+        },
         {
             find: "\"RunningGameStore\"",
             group: true,
@@ -49,12 +57,16 @@ export default definePlugin({
         }
     ],
     start: () => {
+        QuestsStore.addChangeListener(updateQuests);
         updateQuests();
-        startInterval();
     },
     stop: () => {
-        stopInterval();
+        QuestsStore.removeChangeListener(updateQuests);
         stopFarmingAll();
+    },
+
+    renderQuestButton() {
+        return <QuestButton />;
     },
 
     getRunningGames() {
@@ -75,20 +87,6 @@ export default definePlugin({
         }
     }
 });
-
-function startInterval() {
-    stopInterval();
-    updateInterval = setInterval(() => {
-        updateQuests();
-    }, settings.store.checkForNewQuests * 60 * 1000);
-}
-
-function stopInterval() {
-    if (updateInterval) {
-        clearInterval(updateInterval);
-        updateInterval = null;
-    }
-}
 
 function updateQuests() {
     availableQuests = [...QuestsStore.quests.values()];

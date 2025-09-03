@@ -1,0 +1,11 @@
+.quest-button-enrollable > [class^="iconBadge"] {
+    background-color: var(--status-danger);
+}
+
+.quest-button-enrolled > [class^="iconBadge"] {
+    background-color: var(--status-warning);
+}
+
+.quest-button-claimable > [class^="iconBadge"] {
+    background-color: var(--status-positive);
+}

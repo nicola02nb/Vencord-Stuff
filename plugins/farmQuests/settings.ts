@@ -13,5 +13,6 @@ export default definePluginSettings({
         default: 1,
         name: "Interval to check for new quests(min)",
         description: "The time (in minutes) to check for new quests",
+        restartNeeded: true
     }
 });
