@@ -19,8 +19,6 @@ const farmingQuest = new Map();
 const fakeGames = new Map();
 const fakeApplications = new Map();
 
-const updateInterval: NodeJS.Timeout | null = null;
-
 export default definePlugin({
     name: "FarmQuests",
     description: "A plugin that farms you multiple discord quests in background simultaneously.",
@@ -31,7 +29,14 @@ export default definePlugin({
             find: ".winButtonsWithDivider]",
             replacement: {
                 match: /(\((\i)\){)(let{leading)/,
-                replace: "$1$2.trailing.props.children.unshift($self.renderQuestButton());$3"
+                replace: "$1$2.trailing.props.children.unshift($self.renderQuestButtonTopBar());$3"
+            }
+        },
+        {
+            find: "#{intl::ACCOUNT_SPEAKING_WHILE_MUTED}",
+            replacement: {
+                match: /className:\i\.buttons,.{0,50}children:\[/,
+                replace: "$&$self.renderQuestButtonSettingsBar(),"
             }
         },
         {
@@ -65,8 +70,16 @@ export default definePlugin({
         stopFarmingAll();
     },
 
-    renderQuestButton() {
-        return <QuestButton />;
+    renderQuestButtonTopBar() {
+        if (settings.store.showQuestsButtonTopBar) {
+            return <QuestButton type="top-bar" />;
+        }
+    },
+
+    renderQuestButtonSettingsBar() {
+        if (settings.store.showQuestsButtonSettingsBar) {
+            return <QuestButton type="settings-bar" />;
+        }
     },
 
     getRunningGames() {

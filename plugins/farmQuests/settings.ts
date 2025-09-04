@@ -8,11 +8,16 @@ import { definePluginSettings } from "@api/Settings";
 import { OptionType } from "@utils/types";
 
 export default definePluginSettings({
-    checkForNewQuests: {
-        type: OptionType.NUMBER,
-        default: 1,
-        name: "Interval to check for new quests(min)",
-        description: "The time (in minutes) to check for new quests",
+    showQuestsButtonTopBar: {
+        type: OptionType.BOOLEAN,
+        description: "Whether to show the quests button in the top bar.",
+        default: true,
+        restartNeeded: true
+    },
+    showQuestsButtonSettingsBar: {
+        type: OptionType.BOOLEAN,
+        description: "Whether to show the quests button in the settings bar.",
+        default: false,
         restartNeeded: true
     }
 });

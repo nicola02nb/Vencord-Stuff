@@ -15,6 +15,7 @@ import { QuestsStore } from "../stores";
 const QuestIcon: Icon = findByCodeLazy("\"M7.5 21.7a8.95");
 const { navigateToQuestHome } = findByPropsLazy("navigateToQuestHome");
 const TopBarButton = findComponentByCodeLazy("badgePosition");
+const SettingsBarButton = findComponentByCodeLazy("iconForeground:");
 
 function questsStatus() {
     const availableQuests = [...QuestsStore.quests.values()];
@@ -35,37 +36,49 @@ function questsStatus() {
     }, { enrollable: 0, enrolled: 0, claimable: 0, claimed: 0, expired: 0 });
 }
 
-export function QuestButton() {
-    const [state, setState] = useState({ enrollable: 0, enrolled: 0, claimable: 0, claimed: 0, expired: 0 });
+export function QuestButton({ type }: { type: "top-bar" | "settings-bar"; }) {
+    const [state, setState] = useState({ enrollable: 1, enrolled: 1, claimable: 1, claimed: 0, expired: 0 });
 
     const checkForNewQuests = () => {
         setState(questsStatus());
     };
 
     useEffect(() => {
-        QuestsStore.addChangeListener(checkForNewQuests);
+        // QuestsStore.addChangeListener(checkForNewQuests);
         return () => {
             QuestsStore.removeChangeListener(checkForNewQuests);
         };
     }, []);
 
-
-    return (
-        <TopBarButton
-            className={state.enrollable ? "quest-button-enrollable" : state.enrolled ? "quest-button-enrolled" : state.claimable ? "quest-button-claimable" : ""}
-            iconClassName={undefined}
-            /* children={undefined} */
-            selected={undefined}
-            disabled={navigateToQuestHome === undefined}
-            showBadge={state.enrollable > 0 || state.enrolled > 0 || state.claimable > 0}
-            badgePosition={"bottom"}
-            icon={QuestIcon}
-            iconSize={20}
-            onClick={navigateToQuestHome}
-            onContextMenu={undefined}
-            tooltip={state.enrollable ? `${state.enrollable} Enrollable Quests` : state.enrolled ? `${state.enrolled} Enrolled Quests` : state.claimable ? `${state.claimable} Claimable Quests` : "Quests"}
-            tooltipPosition={"bottom"}
-            hideOnClick={false}
-        />
-    );
+    const className = state.enrollable ? "quest-button-enrollable" : state.enrolled ? "quest-button-enrolled" : state.claimable ? "quest-button-claimable" : "";
+    const tooltip = state.enrollable ? `${state.enrollable} Enrollable Quests` : state.enrolled ? `${state.enrolled} Enrolled Quests` : state.claimable ? `${state.claimable} Claimable Quests` : "Quests";
+    if (type === "top-bar") {
+        return (
+            <TopBarButton
+                className={className}
+                iconClassName={undefined}
+                disabled={navigateToQuestHome === undefined}
+                showBadge={state.enrollable > 0 || state.enrolled > 0 || state.claimable > 0}
+                badgePosition={"bottom"}
+                icon={QuestIcon}
+                iconSize={20}
+                onClick={navigateToQuestHome}
+                onContextMenu={undefined}
+                tooltip={tooltip}
+                tooltipPosition={"bottom"}
+                hideOnClick={false}
+            />
+        );
+    } else if (type === "settings-bar") {
+        return (
+            <SettingsBarButton
+                tooltipText={tooltip}
+                onContextMenu={undefined}
+                onClick={navigateToQuestHome}
+                disabled={navigateToQuestHome === undefined}
+                icon={QuestIcon}
+                className={className}
+            />
+        );
+    }
 }
