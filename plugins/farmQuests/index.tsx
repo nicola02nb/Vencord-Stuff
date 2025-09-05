@@ -8,7 +8,7 @@ import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
 import { FluxDispatcher, RestAPI } from "@webpack/common";
 
-import { QuestButton } from "./components/QuestButton";
+import { QuestButton, QuestsCount } from "./components/QuestButton";
 import settings from "./settings";
 import { ChannelStore, GuildChannelStore, QuestsStore, RunningGameStore } from "./stores";
 
@@ -29,7 +29,7 @@ export default definePlugin({
             find: ".winButtonsWithDivider]",
             replacement: {
                 match: /(\((\i)\){)(let{leading)/,
-                replace: "$1$2.trailing.props.children.unshift($self.renderQuestButtonTopBar());$3"
+                replace: "$1$2?.trailing?.props?.children?.unshift($self.renderQuestButtonTopBar());$3"
             }
         },
         {
@@ -37,6 +37,13 @@ export default definePlugin({
             replacement: {
                 match: /className:\i\.buttons,.{0,50}children:\[/,
                 replace: "$&$self.renderQuestButtonSettingsBar(),"
+            }
+        },
+        {
+            find: "\"innerRef\",\"navigate\",\"onClick\"",
+            replacement: {
+                match: /(\i).createElement\("a",(\i)\)/,
+                replace: "$1.createElement(\"a\",$self.renderQuestButtonBadges($2))"
             }
         },
         {
@@ -80,6 +87,13 @@ export default definePlugin({
         if (settings.store.showQuestsButtonSettingsBar) {
             return <QuestButton type="settings-bar" />;
         }
+    },
+
+    renderQuestButtonBadges(questButton) {
+        if (settings.store.showQuestsButtonBadges && questButton?.href.startsWith("/quest-home") && Array.isArray(questButton?.children)) {
+            questButton.children.push(<QuestsCount />);
+        }
+        return questButton;
     },
 
     getRunningGames() {

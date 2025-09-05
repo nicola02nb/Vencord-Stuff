@@ -19,5 +19,10 @@ export default definePluginSettings({
         description: "Whether to show the quests button in the settings bar.",
         default: false,
         restartNeeded: true
+    },
+    showQuestsButtonBadges: {
+        type: OptionType.BOOLEAN,
+        description: "Whether to show badges on the quests button.",
+        default: true
     }
 });

@@ -9,3 +9,11 @@
 .quest-button-claimable > [class^="iconBadge"] {
     background-color: var(--status-positive);
 }
+
+.quest-button svg:has(> [mask^="url(#svg-mask-panel-button)"]) {
+    display: none;
+}
+
+.quest-button-badges {
+    gap: 5px;
+}
