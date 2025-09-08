@@ -1,0 +1,18 @@
+[submodule "plugins/autoSwitchStatus"]
+	path = plugins/autoSwitchStatus
+	url = https://github.com/nicola02nb/autoSwitchStatus
+[submodule "plugins/clickToChat"]
+	path = plugins/clickToChat
+	url = https://github.com/nicola02nb/clickToChat
+[submodule "plugins/notifyWhenMuted"]
+	path = plugins/notifyWhenMuted
+	url = https://github.com/nicola02nb/notifyWhenMuted
+[submodule "plugins/showPing"]
+	path = plugins/showPing
+	url = https://github.com/nicola02nb/showPing
+[submodule "plugins/bypassBlockedOrIgnored"]
+	path = plugins/bypassBlockedOrIgnored
+	url = https://github.com/nicola02nb/bypassBlockedOrIgnored
+[submodule "plugins/completeDiscordQuest"]
+	path = plugins/completeDiscordQuest
+	url = https://github.com/nicola02nb/completeDiscordQuest
